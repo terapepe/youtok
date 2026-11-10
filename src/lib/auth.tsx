@@ -1,8 +1,7 @@
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react'
 import { db, sha256, subscribe, uid, User, Role } from './db'
-import { DEFAULT_PRICING, ZONE_KEYS } from './constants'
 
-const KEY = 'youtok.session'
+const KEY = 'youlip.session'
 
 type Auth = {
   user: User | null; ready: boolean
@@ -19,9 +18,8 @@ const handleOf = (s: string) => s.toLowerCase().replace(/[^a-z0-9_]/g, '').slice
 
 export function newUser(role: Role, name: string, extra: Partial<User> = {}): User {
   return {
-    id: uid(), role, name, handle: handleOf(name), bio: '', category: role === 'creator' ? 'Other' : '',
-    socials: {}, followers: 0, wallets: {}, pricing: { ...DEFAULT_PRICING }, zones: [...ZONE_KEYS],
-    acceptsAds: role === 'creator', saved: [], createdAt: Date.now(), ...extra,
+    id: uid(), role, name, handle: handleOf(name), bio: '', category: role === 'creator' ? 'Other' : '', language: 'English', country: '',
+    channels: [], wallets: {}, listed: role === 'creator', saved: [], savedSlots: [], createdAt: Date.now(), ...extra,
   }
 }
 

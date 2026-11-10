@@ -1,45 +1,67 @@
-// Local data layer (IndexedDB). Every table mirrors supabase/schema.sql so the
-// store can later be swapped for a hosted database without touching the UI.
+// Local data layer (IndexedDB). Tables mirror supabase/schema.sql so the store
+// can be swapped for a hosted database without touching the UI.
 
 export type Role = 'creator' | 'advertiser'
-export type AdType = 'image' | 'text' | 'combo'
+export type PlatformKey = 'youtube' | 'tiktok' | 'facebook' | 'x' | 'instagram' | 'twitch' | 'kick' | 'rumble' | 'other'
+export type LengthKey = '30s' | '1m' | '3m' | '5m' | '10m' | '30m'
+export type AdType = 'image' | 'text' | 'combo' | 'mention' | 'segment' | 'link'
+export type Position = 'intro' | 'mid' | 'outro'
+export type PayTerms = 'delivery' | 'split' | 'upfront'
 export type ZoneKey = 'tl' | 'tr' | 'bl' | 'br' | 'bottom' | 'top'
 
-export interface Pricing { image: number; text: number; combo: number }
-export interface Socials { x?: string; youtube?: string; tiktok?: string; instagram?: string; website?: string }
+export interface Channel { platform: PlatformKey; url: string; handle: string; followers: number; avgViews: number; code: string; verified: boolean }
 
 export interface User {
   id: string; email?: string; passHash?: string; salt?: string
-  role: Role; name: string; handle: string; bio: string; category: string
-  avatarId?: string; socials: Socials; followers: number
+  role: Role; name: string; handle: string; bio: string; category: string; language: string; country: string
+  avatarId?: string; bannerId?: string; channels: Channel[]; website?: string
   wallets: { evm?: string; sol?: string }
-  pricing: Pricing; zones: ZoneKey[]; acceptsAds: boolean
-  company?: string; saved: string[]; createdAt: number
+  listed: boolean; company?: string; saved: string[]; savedSlots: string[]; createdAt: number
 }
+
+// A creator's offer: "I will make a <length> video about <tags> on <platforms>, ad space costs X $LIP"
+export interface SlotFormat { type: AdType; price: number }
+export interface Slot {
+  id: string; creatorId: string; title: string; description: string
+  platforms: PlatformKey[]; length: LengthKey; orientation: 'landscape' | 'portrait'
+  category: string; tags: string[]; language: string
+  formats: SlotFormat[]; positions: Position[]; zones: ZoneKey[]
+  spots: number; exclusive: boolean; publishBy: string; payTerms: PayTerms; blocked: string[]
+  sampleVideoId?: string; status: 'open' | 'paused' | 'closed'; views: number; createdAt: number; updatedAt: number
+}
+
+export type BookingStatus = 'requested' | 'countered' | 'accepted' | 'delivered' | 'revision' | 'completed' | 'declined' | 'cancelled' | 'disputed'
+export interface OverlayStyle { color: string; bg: string; size: number; weight: number; radius: number; opacity: number }
+export interface Delivery { platform: PlatformKey; url: string; adAt: string; views?: number; note?: string; at: number }
+export interface Review { rating: number; text: string; at: number }
+export interface Booking {
+  id: string; slotId: string; creatorId: string; advertiserId: string; campaignId: string
+  type: AdType; position: Position; adCategory: string
+  imageId?: string; text?: string; link?: string; script?: string
+  style: OverlayStyle; x: number; y: number; w: number; h: number; showFor: number
+  offer: number; counter?: number; status: BookingStatus; due: string
+  deliveries: Delivery[]; messages: { by: string; text: string; at: number }[]
+  history: { at: number; by: string; action: string; note?: string }[]
+  reviews: { adv?: Review; creator?: Review }
+  extension?: { date: string; note: string; by: string }
+  dispute?: { by: string; reason: string; at: number }
+  cancelBy?: string
+  createdAt: number; updatedAt: number
+}
+
+// Portfolio: uploaded sample videos or links to published videos
 export interface Video {
   id: string; creatorId: string; title: string; description: string; category: string
-  blobId: string; thumbId?: string; duration: number; width: number; height: number
-  adEnabled: boolean; formats: AdType[]; price?: Partial<Pricing>; zones?: ZoneKey[]
-  views: number; likes: number; createdAt: number
+  platform?: PlatformKey; url?: string; blobId?: string; thumbId?: string
+  duration: number; width: number; height: number; views: number; likes: number; createdAt: number
 }
 export interface Campaign {
   id: string; advertiserId: string; name: string; brand: string; objective: string
   budget: number; status: 'draft' | 'active' | 'completed'; createdAt: number
 }
-export type PlacementStatus = 'pending' | 'quoted' | 'approved' | 'rejected' | 'published' | 'paid' | 'cancelled'
-export interface OverlayStyle { color: string; bg: string; size: number; weight: number; radius: number; opacity: number }
-export interface Placement {
-  id: string; campaignId: string; videoId: string; creatorId: string; advertiserId: string
-  type: AdType; imageId?: string; text?: string; style: OverlayStyle
-  x: number; y: number; w: number; h: number; start: number; end: number
-  offer: number; quote?: number; note?: string; status: PlacementStatus
-  publishedId?: string; impressions: number; adViews: number; clicks: number; link?: string
-  history: { at: number; by: string; action: string; note?: string }[]
-  createdAt: number; updatedAt: number
-}
-export interface Contract { id: string; placementId: string; creatorId: string; advertiserId: string; amount: number; terms: string; createdAt: number }
+export interface Contract { id: string; bookingId: string; creatorId: string; advertiserId: string; amount: number; terms: string; createdAt: number }
 export interface Txn {
-  id: string; placementId: string; from: string; to: string; amount: number
+  id: string; bookingId: string; kind: 'upfront' | 'final' | 'full'; from: string; to: string; amount: number
   network: string; txHash: string; status: 'confirmed' | 'submitted'; createdAt: number
 }
 export interface CollabRequest {
@@ -49,16 +71,16 @@ export interface CollabRequest {
 export interface BlobRec { id: string; blob: Blob; type: string }
 
 type Tables = {
-  users: User; videos: Video; campaigns: Campaign; placements: Placement
+  users: User; slots: Slot; bookings: Booking; videos: Video; campaigns: Campaign
   contracts: Contract; transactions: Txn; requests: CollabRequest; blobs: BlobRec
 }
 export type Table = keyof Tables
-const TABLES: Table[] = ['users', 'videos', 'campaigns', 'placements', 'contracts', 'transactions', 'requests', 'blobs']
+const TABLES: Table[] = ['users', 'slots', 'bookings', 'videos', 'campaigns', 'contracts', 'transactions', 'requests', 'blobs']
 
 let dbp: Promise<IDBDatabase> | null = null
 function open() {
   return (dbp ??= new Promise((res, rej) => {
-    const r = indexedDB.open('youtok', 1)
+    const r = indexedDB.open('youlip', 1)
     r.onupgradeneeded = () => TABLES.forEach((t) => r.result.objectStoreNames.contains(t) || r.result.createObjectStore(t, { keyPath: 'id' }))
     r.onsuccess = () => res(r.result)
     r.onerror = () => rej(r.error)
@@ -105,7 +127,6 @@ export const db = {
   },
 }
 
-// Object URLs for stored blobs (cached per id)
 const urls = new Map<string, string>()
 export async function blobUrl(id?: string) {
   if (!id) return ''

@@ -1,4 +1,13 @@
-import type { Placement } from './db'
+import type { Booking, Position } from './db'
+
+export type Overlay = Pick<Booking, 'type' | 'text' | 'style' | 'x' | 'y' | 'w' | 'h'>
+
+// When the overlay is on screen, given the booked position and the video length
+export function windowOf(pos: Position, duration: number, showFor: number) {
+  const len = Math.min(showFor, duration)
+  const start = pos === 'intro' ? Math.min(1, duration - len) : pos === 'outro' ? Math.max(0, duration - len - 1) : Math.max(0, duration / 2 - len / 2)
+  return { start, end: start + len }
+}
 
 // Reads duration/size from a video file and grabs a thumbnail frame (JPEG)
 export function probeVideo(file: Blob): Promise<{ duration: number; width: number; height: number; thumb: Blob }> {
@@ -30,7 +39,7 @@ function roundRect(g: CanvasRenderingContext2D, x: number, y: number, w: number,
 }
 
 // Draws one placement on a canvas frame (same layout as <AdOverlay/>)
-export function drawPlacement(g: CanvasRenderingContext2D, W: number, H: number, p: Placement, img?: HTMLImageElement) {
+export function drawPlacement(g: CanvasRenderingContext2D, W: number, H: number, p: Overlay, img?: HTMLImageElement) {
   const x = (p.x / 100) * W, y = (p.y / 100) * H, w = (p.w / 100) * W, h = (p.h / 100) * H
   const s = p.style, k = W / 640
   g.save(); g.globalAlpha = s.opacity
@@ -60,11 +69,12 @@ export function drawPlacement(g: CanvasRenderingContext2D, W: number, H: number,
 }
 
 // Renders the source video with the ad burned in → WebM blob (runs in real time)
-export async function renderWithAd(src: string, p: Placement, imageUrl: string, onProgress: (f: number) => void): Promise<Blob> {
+export async function renderWithAd(src: string, p: Overlay & Pick<Booking, 'position' | 'showFor'>, imageUrl: string, onProgress: (f: number) => void): Promise<Blob> {
   const v = document.createElement('video')
   v.src = src; v.playsInline = true; v.crossOrigin = 'anonymous'
   await new Promise((r, j) => { v.onloadedmetadata = r; v.onerror = () => j(new Error('Video failed to load')) })
   const img = imageUrl ? await loadImg(imageUrl) : undefined
+  const win = windowOf(p.position, v.duration, p.showFor)
   const scale = Math.min(1, 1280 / v.videoWidth)
   const c = document.createElement('canvas')
   c.width = Math.round(v.videoWidth * scale) & ~1; c.height = Math.round(v.videoHeight * scale) & ~1
@@ -83,7 +93,7 @@ export async function renderWithAd(src: string, p: Placement, imageUrl: string, 
   let raf = 0
   const frame = () => {
     g.drawImage(v, 0, 0, c.width, c.height)
-    if (v.currentTime >= p.start && v.currentTime <= p.end) drawPlacement(g, c.width, c.height, p, img)
+    if (v.currentTime >= win.start && v.currentTime <= win.end) drawPlacement(g, c.width, c.height, p, img)
     onProgress(v.currentTime / (v.duration || 1))
     raf = requestAnimationFrame(frame)
   }

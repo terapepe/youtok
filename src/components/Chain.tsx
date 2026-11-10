@@ -84,7 +84,7 @@ export function TokenSection() {
     <section className="section" id="sec-token">
       <div className="sec-head">
         <span className="eyebrow">${cfg.symbol} token</span>
-        <h2>The currency of every placement</h2>
+        <h2>The currency of every ad slot</h2>
         <p className="muted">Advertisers pay creators in ${cfg.symbol}, wallet to wallet. {isSingle
           ? <>Live on <b style={{ color: primary.color }}>{primary.name}</b> — {primary.tagline.toLowerCase()}.</>
           : <>Live on {chainCount(activeNetworks.length)}: {activeNetworks.map((n) => n.name).join(', ')}.</>}</p>

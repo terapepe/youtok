@@ -33,7 +33,7 @@ export function Nav() {
   const { user } = useAuth()
   const [open, setOpen] = useState(false)
   const dash = user ? (user.role === 'creator' ? '#/studio' : '#/brand') : '#/auth'
-  const links: [string, string][] = [['#/creators', 'Explore Creators'], ['#/videos', 'Ad Marketplace'], ['#/#sec-how', 'How It Works'], ['#/for-creators', 'For Creators'], ['#/for-advertisers', 'For Advertisers'], ['#/docs', 'Docs']]
+  const links: [string, string][] = [['#/creators', 'Explore Creators'], ['#/slots', 'Ad Slots'], ['#/#sec-how', 'How It Works'], ['#/for-creators', 'For Creators'], ['#/for-advertisers', 'For Advertisers'], ['#/docs', 'Docs']]
   return (
     <header className="nav">
       <Logo />
@@ -59,7 +59,7 @@ export function Footer() {
           <p className="muted">{cfg.positioning}</p>
           <CaChips />
         </div>
-        <div><h5>Marketplace</h5><a href="#/creators">Explore creators</a><a href="#/videos">Ad-ready videos</a><a href="#/for-creators">For creators</a><a href="#/for-advertisers">For advertisers</a></div>
+        <div><h5>Marketplace</h5><a href="#/creators">Explore creators</a><a href="#/slots">Ad slots</a><a href="#/tags">Browse by tag</a><a href="#/for-creators">For creators</a><a href="#/for-advertisers">For advertisers</a></div>
         <div><h5>Docs</h5><a href="#/docs/intro">Introduction</a><a href="#/docs/creators">Creator guide</a><a href="#/docs/advertisers">Advertiser guide</a><a href="#/docs/token">${cfg.symbol} token</a><a href="#/docs/faq">FAQ</a></div>
         <div><h5>Community</h5><a href={cfg.x} target="_blank" rel="noreferrer">X · @{x}</a><a href="#/terms">Terms</a><a href="#/terms">Privacy</a></div>
       </div>
@@ -94,7 +94,7 @@ export function DashShell({ base, title, crumbs, items, tab, children, aside, st
         </div>
         <label className="side-search" onClick={(e) => e.stopPropagation()}>
           <Icon d={I.search} size={15} />
-          <input placeholder="Search…" value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && (location.hash = `#/${user?.role === 'creator' ? 'videos' : 'creators'}?q=${encodeURIComponent(q)}`)} />
+          <input placeholder="Search…" value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && (location.hash = `#/${user?.role === 'creator' ? 'slots' : 'creators'}?q=${encodeURIComponent(q)}`)} />
         </label>
         <nav>{items.map((it) => (
           <a key={it.key} href={`${base}/${it.key}`} className={tab === it.key ? 'on' : ''}>

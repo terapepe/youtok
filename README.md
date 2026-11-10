@@ -1,10 +1,9 @@
-# YOUTOK
+# YOULIP.FUN
 
 **Your Content. Their Brand. Shared Value.**
-The Marketplace Where Creators Monetize Videos and Brands Find Their Audience.
+The Marketplace Where Creators Pre-Sell Ad Slots and Brands Find Their Audience. Token: **YOULIP ($LIP)**.
 
-YOUTOK connects video creators directly with advertisers. Creators sell ad space *inside* their videos (image, text, or image + text overlays). Advertisers pick the video, the position and the seconds, preview the ad, and pay the creator in `$YOUTOK`.
-
+Creators link their channels (YouTube, TikTok, Facebook, X, Instagram, Twitch, Kick, Rumble…) and list **ad slots** for videos they are about to make: length (30s, 1, 3, 5, 10, 30 min), platforms, content tags, the ad formats they accept and **their own $LIP price** for each. Advertisers search creators and slots, book, send their creative, review the delivery and pay in $LIP.
 ## Stack
 
 Vite + React + TypeScript · wagmi/viem (Robinhood, Base, BNB Chain) · Solana wallet adapter · IndexedDB local data layer.
@@ -40,15 +39,18 @@ Optional env (`.env`): `VITE_SOLANA_RPC`, `VITE_ROBINHOOD_RPC`, `VITE_ROBINHOOD_
 
 ## Features
 
-- **Landing**: hero, live platform stats, featured creators, trending ad-ready videos, 7-step workflow, formats bento, creator/advertiser benefits, token section.
-- **Creator marketplace**: search, category filter, sort by followers / average views / price / newest.
-- **Video ad marketplace**: filter by category and format, sort by views / engagement / price.
-- **Video Ad Placement Editor**: upload an image, enter text, drag and resize the overlay, keep it inside the creator's allowed zones, set start/end timestamps, style it, preview it inside the video, then submit an offer.
-- **Creator Studio**: overview, video upload (thumbnail and duration are extracted automatically), video management, ad requests (approve / quote / reject), **publish** (the ad is rendered into the video with canvas + MediaRecorder), pricing & zones, campaign history, payments, analytics, profile.
-- **Advertiser Hub**: overview, discover, saved creators, campaigns (accept quote / withdraw / **pay**), create campaign, editor, collaboration (hire) requests, analytics (impressions, ad views, clicks, cost per ad view), payments, profile.
-- **Auth**: email + password (salted SHA-256), wallet sign-in (EVM signature verified with viem; Solana `signMessage`), role selection, role-based dashboard access, switch roles from your profile.
-- **Payments**: real on-chain `$YOUTOK` transfers. ERC-20 `transfer` on EVM; SPL `TransferChecked` on Solana, which also creates the recipient's token account if needed. Every transfer is recorded with its tx hash and an explorer link.
-- **Docs** at `#/docs`: introduction, quick start, creator guide, advertiser guide, placement, token, FAQ.
+- **Explore Creators**: platform, category, size tier, language, rating, max price and open-slot filters; 7 sort orders; grid/list view; top rated; browse by category.
+- **Ad Slots**: filter by platform, length, tag, category, format, language, payment terms, orientation and price; sort by publish date, price, reach or spots.
+- **Tags**: browse slots by topic.
+- **Creator profile**: banner, tier, linked channels, open slots, portfolio, reviews, save, custom request.
+- **Booking editor**: choose format and position, ad category (blocked ones are refused), logo/text overlay with drag, resize and zone check, or a script for mentions and segments, plus an offer.
+- **Ad formats**: logo overlay, text overlay, logo + text, verbal mention, sponsored segment, link in description.
+- **Deal lifecycle**: requested → countered → accepted → delivered → revision → completed, with decline, withdraw, extension requests, overdue cancel, disputes, mutual cancel, per-deal chat, history and two-way reviews.
+- **Payment terms per slot**: on delivery, 50/50, or upfront. Real on-chain $LIP transfers (ERC-20 / SPL) recorded with tx hash.
+- **Creator Studio**: channels (with verification codes), ad slots (create/edit/pause/duplicate/close), bookings, portfolio, custom requests, payments, analytics, reviews, profile.
+- **Advertiser Hub**: discover, saved creators and slots, bookings, campaigns with budget warnings, custom requests, analytics (reported views, CPM), payments, reviews.
+- **Overlay render tool**: burns the booked overlay into the creator's final video file in the browser.
+- **Docs** at `#/docs`: introduction, quick start, guides, ad formats, deal scenarios, token, FAQ.
 
 ## Data
 
@@ -57,4 +59,4 @@ This version stores all data in the browser (IndexedDB, `src/lib/db.ts`), so the
 
 ## Brand assets
 
-`public/logo.svg` (mark: a play button with an ad tile docked in the corner) · `public/logo-full.svg` (mark + wordmark) · `public/chains/*.svg`.
+`public/logo.svg` (mark: a speech bubble with a play button and a $LIP coin) · `public/logo-full.svg` (mark + wordmark) · `public/chains/*.svg`.

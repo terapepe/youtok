@@ -2,11 +2,11 @@ import { ReactNode, useEffect, useState } from 'react'
 import cfg from '../config/config.json'
 
 export function Logo({ size = 30, word = true }: { size?: number; word?: boolean }) {
-  const b = cfg.brand, cut = Math.ceil(b.length / 2)
+  const [main, tld] = cfg.brand.split('.'), cut = Math.ceil(main.length / 2)
   return (
-    <a href="#/" className="logo" aria-label={b}>
+    <a href="#/" className="logo" aria-label={cfg.brand}>
       <img src="/logo.svg" width={size} height={size} alt="" />
-      {word && <span className="word">{b.slice(0, cut)}<em>{b.slice(cut)}</em></span>}
+      {word && <span className="word">{main.slice(0, cut)}<em>{main.slice(cut)}</em>{tld && <small>.{tld}</small>}</span>}
     </a>
   )
 }
@@ -46,7 +46,12 @@ export const I = {
   send: 'M22 2L11 13|M22 2l-7 20-4-9-9-4z',
   doc: 'M6 2h9l5 5v15H6z|M14 2v6h6',
   bookmark: 'M6 3h12v18l-6-4-6 4z',
-  x_logo: 'M4 4l16 16|M20 4L4 20',
+  cal: 'M4 6h16v14H4z|M4 10h16|M8 3v5|M16 3v5',
+  flag: 'M5 21V4|M5 4h11l-2 4 2 4H5',
+  chat: 'M4 5h16v11H9l-5 4z',
+  link: 'M10 14a4 4 0 0 0 6 0l3-3a4 4 0 0 0-6-6l-1 1|M14 10a4 4 0 0 0-6 0l-3 3a4 4 0 0 0 6 6l1-1',
+  clock: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z|M12 7v5l3 2',
+  slot: 'M4 5h16v14H4z|M4 9h16|M9 13h6',
 }
 
 export function Stat({ label, value, sub, icon }: { label: string; value: ReactNode; sub?: ReactNode; icon?: string }) {
@@ -71,9 +76,9 @@ export function Empty({ title, text, action }: { title: string; text?: string; a
 }
 
 const STATUS_TONE: Record<string, string> = {
-  pending: 'warn', open: 'warn', quoted: 'info', approved: 'ok', accepted: 'ok', published: 'brand',
-  paid: 'ok', rejected: 'bad', declined: 'bad', cancelled: 'bad', active: 'brand', completed: 'ok', draft: 'muted',
-  confirmed: 'ok', submitted: 'info',
+  requested: 'warn', open: 'warn', countered: 'info', quoted: 'info', accepted: 'brand', delivered: 'info', revision: 'warn',
+  completed: 'ok', declined: 'bad', cancelled: 'bad', disputed: 'bad', overdue: 'bad', active: 'brand', draft: 'muted',
+  paused: 'muted', closed: 'muted', confirmed: 'ok', submitted: 'info', paid: 'ok', message: 'muted',
 }
 export const Badge = ({ s, children }: { s: string; children?: ReactNode }) => <span className={`badge ${STATUS_TONE[s] || 'muted'}`}>{children ?? s}</span>
 

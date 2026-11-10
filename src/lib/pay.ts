@@ -14,7 +14,7 @@ const ata = (owner: PublicKey, mint: PublicKey, prog: PublicKey) =>
 
 export type PayResult = { hash: string; network: Network; from: string }
 
-// Sends $YOUTOK from the connected wallet to the creator's wallet on the chosen network
+// Sends $LIP from the connected wallet to the creator's wallet on the chosen network
 export function usePay() {
   const evm = useAccount()
   const { writeContractAsync } = useWriteContract()

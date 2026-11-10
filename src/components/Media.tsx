@@ -1,7 +1,10 @@
-import { CSSProperties, useEffect, useMemo } from 'react'
-import { useBlobUrl } from '../lib/hooks'
-import type { Placement, User, Video } from '../lib/db'
-import { AD_TYPES, dur, fmt, tok } from '../lib/constants'
+import { CSSProperties, ReactNode, useEffect, useMemo } from 'react'
+import { useBlobUrl, Market } from '../lib/hooks'
+import { useAuth } from '../lib/auth'
+import { db, Booking, PlatformKey, Slot, User, Video } from '../lib/db'
+import {
+  avgViewsOf, dateLabel, dealsDone, dur, fmt, followersOf, isLive, lengthOf, minPrice, PLATFORMS, ratingOf, spotsLeft, tierOf, tok, typeLabel,
+} from '../lib/constants'
 import { Icon, I } from './ui'
 
 const hue = (s: string) => [...s].reduce((a, c) => a + c.charCodeAt(0), 0) % 360
@@ -13,75 +16,117 @@ export function Avatar({ u, size = 40 }: { u?: Pick<User, 'name' | 'avatarId' | 
   return <span className="avatar" style={st}>{url ? <img src={url} alt="" /> : (u?.name || '?').slice(0, 1).toUpperCase()}</span>
 }
 
-export function Thumb({ v, children }: { v: Video; children?: React.ReactNode }) {
-  const url = useBlobUrl(v.thumbId)
+export function Banner({ u, children }: { u: User; children?: ReactNode }) {
+  const url = useBlobUrl(u.bannerId), h = hue(u.id)
+  return <div className="banner" style={{ backgroundImage: url ? `url(${url})` : `radial-gradient(600px 200px at 20% 0, hsl(${h} 70% 45% / .55), transparent), radial-gradient(500px 200px at 90% 100%, hsl(${(h + 80) % 360} 70% 45% / .4), transparent)` }}>{children}</div>
+}
+
+export const PlatformBadge = ({ p, size = 22 }: { p: PlatformKey; size?: number }) => {
+  const m = PLATFORMS[p]
+  return <span className="pf" title={m.name} style={{ width: size, height: size, fontSize: size * (m.short.length > 2 ? 0.32 : 0.42), ['--pf' as string]: m.color }}>{m.short}</span>
+}
+export const PlatformStack = ({ list, size = 20 }: { list: PlatformKey[]; size?: number }) => (
+  <span className="pf-stack">{[...new Set(list)].map((p) => <PlatformBadge key={p} p={p} size={size} />)}</span>
+)
+
+export function Stars({ value, count, small }: { value: number; count?: number; small?: boolean }) {
+  if (!count) return <span className={`stars none${small ? ' sm' : ''}`}>New</span>
+  return <span className={`stars${small ? ' sm' : ''}`}><Icon d={I.star} size={small ? 12 : 14} />{value.toFixed(1)}<em>({count})</em></span>
+}
+
+export const TierBadge = ({ u }: { u: Pick<User, 'channels'> }) => { const t = tierOf(u); return <span className={`tier t-${t.key}`}>{t.label}</span> }
+
+function SaveBtn({ kind, id }: { kind: 'creator' | 'slot'; id: string }) {
+  const { user, update } = useAuth()
+  const list = kind === 'creator' ? user?.saved || [] : user?.savedSlots || []
+  const on = list.includes(id)
   return (
-    <div className="thumb">
-      {url ? <img src={url} alt="" loading="lazy" /> : <div className="thumb-ph" />}
-      <span className="dur">{dur(v.duration)}</span>
-      {children}
-    </div>
+    <button className={`save${on ? ' on' : ''}`} title={on ? 'Saved' : 'Save'} onClick={(e) => {
+      e.preventDefault(); e.stopPropagation()
+      if (!user) return (location.hash = '#/auth?role=advertiser')
+      const next = on ? list.filter((x) => x !== id) : [...list, id]
+      update(kind === 'creator' ? { saved: next } : { savedSlots: next })
+    }}><Icon d={I.bookmark} size={15} /></button>
   )
 }
 
-export const minPrice = (v: Video, c?: User) => {
-  const p = { ...(c?.pricing || {}), ...(v.price || {}) } as Record<string, number>
-  const vals = v.formats.map((f) => p[f]).filter((x) => x > 0)
-  return vals.length ? Math.min(...vals) : 0
-}
-
-export function VideoCard({ v, c, ads = true }: { v: Video; c?: User; ads?: boolean }) {
-  const price = minPrice(v, c)
+export function CreatorCard({ c, m, list }: { c: User; m: Market; list?: boolean }) {
+  const open = m.slots.filter((s) => s.creatorId === c.id && isLive(s, m.bookings))
+  const from = Math.min(...open.map(minPrice))
+  const r = ratingOf(c.id, m.bookings)
+  const tags = [...new Set(open.flatMap((s) => s.tags))].slice(0, 4)
   return (
-    <article className="vcard glass">
-      <a href={`#/video/${v.id}`}><Thumb v={v}>{v.adEnabled && <span className="ad-ok"><Icon d={I.bolt} size={12} />Ad-ready</span>}</Thumb></a>
-      <div className="vcard-b">
-        <a href={`#/video/${v.id}`} className="vtitle">{v.title}</a>
-        {c && <a href={`#/creator/${c.id}`} className="vby"><Avatar u={c} size={20} />{c.name}</a>}
-        <div className="vmeta"><span><Icon d={I.eye} size={13} />{fmt(v.views)}</span><span><Icon d={I.heart} size={13} />{fmt(v.likes)}</span><span>{v.category}</span></div>
-        {ads && v.adEnabled && <>
-          <div className="formats">{AD_TYPES.filter((a) => v.formats.includes(a.key)).map((a) => <span key={a.key}>{a.label.replace(' Placement', '')}</span>)}</div>
-          <div className="vcard-f">
-            <span className="price">{price ? <>from <b>{tok(price)}</b></> : <span className="muted">Open to offers</span>}</span>
-            <a className="btn sm" href={`#/editor/${v.id}`}>Request Ad</a>
-          </div>
-        </>}
+    <a className={`ccard glass${list ? ' list' : ''}`} href={`#/creator/${c.id}`}>
+      {!list && <Banner u={c} />}
+      <div className="ccard-h">
+        <Avatar u={c} size={list ? 52 : 60} />
+        <div className="grow"><b className="clamp1">{c.name}{c.channels.some((x) => x.verified) && <Icon d={I.check} size={14} />}</b><span className="muted small">@{c.handle} · {c.category}</span></div>
+        <SaveBtn kind="creator" id={c.id} />
       </div>
-    </article>
-  )
-}
-
-export function CreatorCard({ c, videos }: { c: User; videos: Video[] }) {
-  const mine = videos.filter((v) => v.creatorId === c.id)
-  const avg = mine.length ? mine.reduce((s, v) => s + v.views, 0) / mine.length : 0
-  const from = Math.min(...[c.pricing.image, c.pricing.text, c.pricing.combo].filter((x) => x > 0), Infinity)
-  return (
-    <a className="ccard glass" href={`#/creator/${c.id}`}>
-      <div className="ccard-h"><Avatar u={c} size={52} /><div><b>{c.name}</b><span className="muted small">@{c.handle}</span></div><span className="cat">{c.category}</span></div>
-      <p className="muted small clamp2">{c.bio || 'No bio yet.'}</p>
+      {!list && <p className="muted small clamp2">{c.bio || 'No bio yet.'}</p>}
+      <div className="ccard-pf">{c.channels.length ? c.channels.slice(0, 5).map((ch, i) => <span key={i}><PlatformBadge p={ch.platform} size={20} />{fmt(ch.followers)}</span>) : <span className="muted small">No channels linked</span>}</div>
       <div className="ccard-s">
-        <div><b>{fmt(c.followers)}</b><span>Followers</span></div>
-        <div><b>{fmt(avg)}</b><span>Avg views</span></div>
-        <div><b>{mine.length}</b><span>Videos</span></div>
+        <div><b>{fmt(followersOf(c))}</b><span>Followers</span></div>
+        <div><b>{fmt(avgViewsOf(c))}</b><span>Avg views</span></div>
+        <div><b>{dealsDone(c.id, m.bookings)}</b><span>Deals</span></div>
+        <div><b>{open.length}</b><span>Open slots</span></div>
       </div>
+      {tags.length > 0 && <div className="tags">{tags.map((t) => <span key={t}>#{t}</span>)}</div>}
       <div className="ccard-f">
-        <Socials s={c.socials} />
-        <span className="price">{Number.isFinite(from) ? <>from <b>{tok(from)}</b></> : <span className="muted">Open to offers</span>}</span>
+        <span className="row-g"><TierBadge u={c} /><Stars value={r.avg} count={r.count} small /><span className="muted small">{c.language}</span></span>
+        <span className="price">{Number.isFinite(from) ? <>from <b>{tok(from)}</b></> : <span className="muted">No open slots</span>}</span>
       </div>
     </a>
   )
 }
 
-const SOC: [keyof User['socials'], string][] = [['x', 'X'], ['youtube', 'YouTube'], ['tiktok', 'TikTok'], ['instagram', 'Instagram'], ['website', 'Web']]
-export function Socials({ s }: { s: User['socials'] }) {
-  const list = SOC.filter(([k]) => s[k])
-  if (!list.length) return <span />
-  return <span className="socials">{list.map(([k, l]) => <span key={k} className="soc" onClick={(e) => { e.preventDefault(); e.stopPropagation(); window.open(s[k]!.startsWith('http') ? s[k] : `https://${s[k]}`, '_blank', 'noopener') }}>{l}</span>)}</span>
+export function SlotCard({ s, c, bookings }: { s: Slot; c?: User; bookings: Booking[] }) {
+  const left = spotsLeft(s, bookings), live = isLive(s, bookings), p = minPrice(s)
+  return (
+    <article className={`scard glass${live ? '' : ' off'}`}>
+      <a href={`#/slot/${s.id}`} className="scard-top">
+        <div className={`scard-frame ${s.orientation}`}><span className="len">{lengthOf(s.length).label}</span><Icon d={I.play} size={20} /></div>
+        <div className="grow">
+          <div className="row-g"><PlatformStack list={s.platforms} size={20} /><span className="muted small">{s.category}</span></div>
+          <b className="clamp2 stitle">{s.title}</b>
+        </div>
+        <SaveBtn kind="slot" id={s.id} />
+      </a>
+      {c && <a className="vby" href={`#/creator/${c.id}`}><Avatar u={c} size={22} />{c.name}<span className="muted">· {fmt(followersOf(c))} followers</span></a>}
+      <div className="tags">{s.tags.slice(0, 5).map((t) => <span key={t}>#{t}</span>)}</div>
+      <ul className="fmt-prices">{s.formats.slice(0, 3).map((f) => <li key={f.type}><span>{typeLabel(f.type)}</span><b>{tok(f.price)}</b></li>)}{s.formats.length > 3 && <li className="muted small">+{s.formats.length - 3} more formats</li>}</ul>
+      <div className="scard-f">
+        <span className="small muted"><Icon d={I.cal} size={13} /> by {dateLabel(s.publishBy)} · {s.exclusive ? 'Exclusive' : `${left}/${s.spots} spots`}</span>
+        {live ? <a className="btn sm" href={`#/book/${s.id}`}>Book · {tok(p)}</a> : <span className="badge muted">{s.status !== 'open' ? s.status : left ? 'Expired' : 'Sold out'}</span>}
+      </div>
+    </article>
+  )
+}
+
+export function Thumb({ v, children }: { v: Video; children?: ReactNode }) {
+  const url = useBlobUrl(v.thumbId)
+  return (
+    <div className="thumb">
+      {url ? <img src={url} alt="" loading="lazy" /> : <div className="thumb-ph">{v.platform && <PlatformBadge p={v.platform} size={34} />}</div>}
+      {v.duration > 0 && <span className="dur">{dur(v.duration)}</span>}
+      {children}
+    </div>
+  )
+}
+
+export function PortfolioCard({ v }: { v: Video }) {
+  const href = v.blobId ? `#/video/${v.id}` : v.url
+  return (
+    <a className="vcard glass" href={href} target={v.blobId ? undefined : '_blank'} rel="noreferrer" onClick={() => db.patch('videos', v.id, { views: v.views + 1 })}>
+      <Thumb v={v} />
+      <div className="vcard-b"><b className="clamp2">{v.title}</b><span className="muted small">{v.platform ? PLATFORMS[v.platform].name : 'Sample'} · {v.category}{v.blobId ? '' : ' ↗'}</span></div>
+    </a>
+  )
 }
 
 // HTML overlay identical in layout to drawPlacement() in lib/media.ts
 export function AdOverlay({ p, imageUrl, visible = true, selected, onPointerDown, onResize }: {
-  p: Pick<Placement, 'type' | 'text' | 'style' | 'x' | 'y' | 'w' | 'h'>; imageUrl?: string; visible?: boolean; selected?: boolean
+  p: Pick<Booking, 'type' | 'text' | 'style' | 'x' | 'y' | 'w' | 'h'>; imageUrl?: string; visible?: boolean; selected?: boolean
   onPointerDown?: (e: React.PointerEvent) => void; onResize?: (e: React.PointerEvent) => void
 }) {
   const s = p.style
@@ -95,6 +140,21 @@ export function AdOverlay({ p, imageUrl, visible = true, selected, onPointerDown
       {p.type !== 'text' && (imageUrl ? <img src={imageUrl} alt="" draggable={false} /> : <span className="ph">Logo</span>)}
       {p.type !== 'image' && <span className="txt">{p.text || 'Your message'}</span>}
       {onResize && <i className="handle" onPointerDown={(e) => { e.stopPropagation(); onResize(e) }} />}
+    </div>
+  )
+}
+
+// Placeholder "video frame" used when the slot has no sample video yet
+export function MockFrame({ portrait, label }: { portrait?: boolean; label?: string }) {
+  return (
+    <div className="mock" aria-hidden>
+      <svg viewBox={portrait ? '0 0 180 320' : '0 0 320 180'} preserveAspectRatio="xMidYMid slice">
+        <defs><linearGradient id="mk" x1="0" y1="0" x2="0" y2="1"><stop stopColor="#2A2350" /><stop offset="1" stopColor="#15142A" /></linearGradient></defs>
+        <rect width="100%" height="100%" fill="url(#mk)" />
+        <circle cx="50%" cy="38%" r={portrait ? 34 : 26} fill="#8B7CFF" opacity=".25" />
+        <rect x="35%" y="58%" width="30%" height="5%" rx="4" fill="#fff" opacity=".12" />
+      </svg>
+      {label && <span>{label}</span>}
     </div>
   )
 }

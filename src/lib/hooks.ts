@@ -32,3 +32,10 @@ export function useRoute() {
 }
 export const go = (path: string) => { location.hash = path.startsWith('#') ? path : '#' + path }
 export const query = () => new URLSearchParams(location.hash.split('?')[1] || '')
+
+// All marketplace tables at once (live)
+export function useMarket() {
+  const users = useTable('users'), slots = useTable('slots'), bookings = useTable('bookings'), videos = useTable('videos')
+  return { users: users.rows, slots: slots.rows, bookings: bookings.rows, videos: videos.rows, ready: users.ready && slots.ready && bookings.ready }
+}
+export type Market = ReturnType<typeof useMarket>

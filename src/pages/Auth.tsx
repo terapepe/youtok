@@ -11,7 +11,7 @@ import { Page, WalletButton } from '../components/Layout'
 import { ChainStack } from '../components/Chain'
 import { Field, Icon, I } from '../components/ui'
 
-const dest = (r: Role) => query().get('next') || (r === 'creator' ? '/studio' : '/brand')
+const dest = (r: Role, isNew = false) => query().get('next') || (r === 'creator' ? (isNew ? '/studio/channels' : '/studio') : '/brand')
 
 function RolePick({ role, setRole }: { role: Role; setRole: (r: Role) => void }) {
   return (
@@ -20,7 +20,7 @@ function RolePick({ role, setRole }: { role: Role; setRole: (r: Role) => void })
         <button key={r} type="button" className={role === r ? 'on' : ''} onClick={() => setRole(r)}>
           <Icon d={r === 'creator' ? I.video : I.bolt} size={22} />
           <b>{r === 'creator' ? 'Creator' : 'Advertiser'}</b>
-          <span>{r === 'creator' ? 'Sell ad space in my videos' : 'Place ads in creator videos'}</span>
+          <span>{r === 'creator' ? 'Pre-sell ad slots in my next videos' : 'Book ads in creator videos'}</span>
         </button>
       ))}
     </div>
@@ -45,7 +45,7 @@ export default function Auth() {
     e.preventDefault(); setErr(''); setBusy(true)
     try {
       const u = mode === 'login' ? await auth.login(email, pw) : await auth.register({ email, password: pw, role, name })
-      go(dest(u.role))
+      go(dest(u.role, mode === 'register'))
     } catch (x) { setErr((x as Error).message) } finally { setBusy(false) }
   }
 
@@ -73,7 +73,7 @@ export default function Auth() {
   const finishWallet = async () => {
     if (!needRole) return
     const u = await auth.walletLogin({ ...needRole, role, name })
-    if (u) go(dest(u.role))
+    if (u) go(dest(u.role, true))
   }
 
   return (
@@ -106,8 +106,8 @@ export default function Auth() {
         <div className="auth-side">
           <h2>{cfg.tagline}</h2>
           <ul>
-            <li><Icon d={I.check} size={16} />Creators: upload videos, set prices, approve ads, get paid.</li>
-            <li><Icon d={I.check} size={16} />Advertisers: find creators, place ads, preview, track results.</li>
+            <li><Icon d={I.check} size={16} />Creators: link channels, list ad slots with your own $LIP price, get paid.</li>
+            <li><Icon d={I.check} size={16} />Advertisers: search creators and slots, book, review deliveries, pay.</li>
             <li><Icon d={I.check} size={16} />One account, switch roles any time from your profile.</li>
           </ul>
         </div>

@@ -1,28 +1,53 @@
 {
   "_readme": "Edit this file to change brand, token, networks and contract addresses. See README.md → Configuration.",
-  "brand": "YOUTOK",
-  "tokenName": "YOUTOK",
-  "symbol": "YOUTOK",
+  "brand": "YOULIP.FUN",
+  "tokenName": "YOULIP",
+  "symbol": "LIP",
   "tagline": "Your Content. Their Brand. Shared Value.",
-  "positioning": "The Marketplace Where Creators Monetize Videos and Brands Find Their Audience.",
-
+  "positioning": "The Marketplace Where Creators Pre-Sell Ad Slots and Brands Find Their Audience.",
   "mode": "multi",
   "singleNetwork": "base",
-  "multiOrder": ["solana", "robinhood", "base", "bsc"],
-
+  "multiOrder": [
+    "solana",
+    "robinhood",
+    "base",
+    "bsc"
+  ],
   "evmAddress": "",
   "solanaAddress": "",
   "tokenDecimals": 18,
-
   "chains": {
-    "solana":    { "name": "Solana",    "short": "SOL",  "color": "#9945FF", "tagline": "Near-zero fees for every placement", "ca": "" },
-    "robinhood": { "name": "Robinhood", "short": "RH",   "color": "#CCFF00", "tagline": "Fast, low-fee L2 built for trading", "ca": "" },
-    "base":      { "name": "Base",      "short": "BASE", "color": "#2F6BFF", "tagline": "Onchain with the Base community",   "ca": "" },
-    "bsc":       { "name": "BNB Chain", "short": "BSC",  "color": "#F0B90B", "tagline": "Massive reach on BNB Chain",        "ca": "" }
+    "solana": {
+      "name": "Solana",
+      "short": "SOL",
+      "color": "#9945FF",
+      "tagline": "Near-zero fees for every ad slot",
+      "ca": ""
+    },
+    "robinhood": {
+      "name": "Robinhood",
+      "short": "RH",
+      "color": "#CCFF00",
+      "tagline": "Fast, low-fee L2 built for trading",
+      "ca": ""
+    },
+    "base": {
+      "name": "Base",
+      "short": "BASE",
+      "color": "#2F6BFF",
+      "tagline": "Onchain with the Base community",
+      "ca": ""
+    },
+    "bsc": {
+      "name": "BNB Chain",
+      "short": "BSC",
+      "color": "#F0B90B",
+      "tagline": "Massive reach on BNB Chain",
+      "ca": ""
+    }
   },
-
   "x": "https://x.com/You_tok",
-  "site": "https://youtok.xyz",
+  "site": "https://youlip.fun",
   "platformFeePct": 5,
   "maxVideoMB": 200
 }
