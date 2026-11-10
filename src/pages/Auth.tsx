@@ -10,6 +10,7 @@ import { short } from '../lib/constants'
 import { Page, WalletButton } from '../components/Layout'
 import { ChainStack } from '../components/Chain'
 import { Field, Icon, I } from '../components/ui'
+import { PlatformOrbit } from '../components/Art'
 
 const dest = (r: Role, isNew = false) => query().get('next') || (r === 'creator' ? (isNew ? '/studio/channels' : '/studio') : '/brand')
 
@@ -104,6 +105,7 @@ export default function Auth() {
           {err && <p className="err">{err}</p>}
         </div>
         <div className="auth-side">
+          <PlatformOrbit size={240} />
           <h2>{cfg.tagline}</h2>
           <ul>
             <li><Icon d={I.check} size={16} />Creators: link channels, list ad slots with your own $LIP price, get paid.</li>

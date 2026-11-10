@@ -50,5 +50,6 @@
   "site": "https://youlip.fun",
   "platformFeePct": 5,
   "maxVideoMB": 200,
-  "sampleCreators": true
+  "sampleCreators": true,
+  "platformIcons": {}
 }

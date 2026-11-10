@@ -1,5 +1,6 @@
 import { ReactNode, useEffect, useState } from 'react'
 import cfg from '../config/config.json'
+import { EmptyArt } from './Art'
 
 export function Logo({ size = 30, word = true }: { size?: number; word?: boolean }) {
   const [main, tld] = cfg.brand.split('.'), cut = Math.ceil(main.length / 2)
@@ -67,7 +68,7 @@ export function Stat({ label, value, sub, icon }: { label: string; value: ReactN
 export function Empty({ title, text, action }: { title: string; text?: string; action?: ReactNode }) {
   return (
     <div className="empty">
-      <img src="/logo.svg" width={40} height={40} alt="" />
+      <EmptyArt />
       <h4>{title}</h4>
       {text && <p>{text}</p>}
       {action}

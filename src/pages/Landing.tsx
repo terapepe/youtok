@@ -7,6 +7,7 @@ import { Page } from '../components/Layout'
 import { ChainIcon, ChainStack, CopyCAButtons, TokenSection } from '../components/Chain'
 import { CreatorCard, PlatformBadge, PlatformStack, SlotCard } from '../components/Media'
 import { Empty, Icon, I } from '../components/ui'
+import { Duo, FormatArt, HeroDeco, LengthDial, StepNum } from '../components/Art'
 
 export const CREATOR_STEPS = [
   ['Link your channels', 'YouTube, TikTok, Facebook, X, Instagram, Twitch… followers and views build your profile.'],
@@ -58,6 +59,7 @@ export default function Landing({ anchor }: { anchor?: string }) {
   return (
     <Page>
       <section className="hero">
+        <HeroDeco />
         <div className="hero-l">
           <span className="eyebrow pill">{isSingle ? <><ChainIcon n={primary} size={16} /> Built on {primary.name}</> : <><ChainStack size={16} /> Live on {activeNetworks.map((n) => n.short).join(' · ')}</>}</span>
           <h1>Sell the ad <span className="grad">before you film.</span></h1>
@@ -96,7 +98,7 @@ export default function Landing({ anchor }: { anchor?: string }) {
 
       <section className="section">
         <div className="sec-head row"><div><span className="eyebrow">Fresh ad slots</span><h2>Upcoming videos open for sponsors</h2></div><a className="btn ghost" href="#/slots">All ad slots</a></div>
-        <div className="len-strip">{LENGTHS.map((l) => <a key={l.key} href={`#/slots?length=${l.key}`} className="glass"><b>{l.label}</b><span>{live.filter((s) => s.length === l.key).length} open</span></a>)}</div>
+        <div className="len-strip">{LENGTHS.map((l) => <a key={l.key} href={`#/slots?length=${l.key}`} className="glass"><LengthDial sec={l.sec} /><b>{l.label}</b><span>{live.filter((s) => s.length === l.key).length} open</span></a>)}</div>
         {fresh.length ? <div className="grid c3">{fresh.map((s) => <SlotCard key={s.id} s={s} c={uById(s.creatorId)} bookings={m.bookings} />)}</div>
           : <Empty title="No open ad slots yet" text="Ad slots appear here as soon as creators list the videos they plan to make." action={<a className="btn" href="#/studio/slots">List an ad slot</a>} />}
         {tags.length > 0 && <div className="tag-cloud">{tags.map(([t, n]) => <a key={t} href={`#/slots?tag=${t}`}>#{t}<em>{n}</em></a>)}</div>}
@@ -105,8 +107,8 @@ export default function Landing({ anchor }: { anchor?: string }) {
       <section className="section" id="sec-how">
         <div className="sec-head"><span className="eyebrow">How {cfg.brand} works</span><h2>Two sides, one simple deal</h2></div>
         <div className="tracks">
-          <div><h3><Icon d={I.video} /> For creators</h3><ol className="steps">{CREATOR_STEPS.map(([t, d], i) => <li key={t} className="glass"><span>{String(i + 1).padStart(2, '0')}</span><b>{t}</b><p>{d}</p></li>)}</ol></div>
-          <div><h3><Icon d={I.bolt} /> For advertisers</h3><ol className="steps">{ADV_STEPS.map(([t, d], i) => <li key={t} className="glass"><span>{String(i + 1).padStart(2, '0')}</span><b>{t}</b><p>{d}</p></li>)}</ol></div>
+          <div><h3><Icon d={I.video} /> For creators</h3><ol className="steps">{CREATOR_STEPS.map(([t, d], i) => <li key={t} className="glass"><StepNum n={i + 1} /><b>{t}</b><p>{d}</p></li>)}</ol></div>
+          <div><h3><Icon d={I.bolt} /> For advertisers</h3><ol className="steps">{ADV_STEPS.map(([t, d], i) => <li key={t} className="glass"><StepNum n={i + 1} /><b>{t}</b><p>{d}</p></li>)}</ol></div>
         </div>
       </section>
 
@@ -115,8 +117,7 @@ export default function Landing({ anchor }: { anchor?: string }) {
         <div className="bento">
           {AD_TYPES.map((a, i) => (
             <div key={a.key} className={`bento-i glass f${i}`}>
-              {a.overlay ? <div className={`fmt-demo t-${a.key}`}>{a.key !== 'text' && <img src="/logo.svg" alt="" />}{a.key !== 'image' && <span>Summer sale · 30% off</span>}</div>
-                : <Icon d={a.key === 'mention' ? I.chat : a.key === 'segment' ? I.video : I.link} size={28} />}
+              <FormatArt type={a.key} />
               <h3>{a.label}</h3><p className="muted">{a.desc}.</p>
             </div>
           ))}
@@ -136,7 +137,7 @@ export default function Landing({ anchor }: { anchor?: string }) {
             [I.flag, 'Disputes', 'Either side can open a dispute with a reason. The deal is frozen until both agree.'],
             [I.chat, 'Deal chat', 'Every booking has its own message thread and full history.'],
             [I.star, 'Two-way reviews', 'After completion both sides rate each other. Ratings show on every profile.'],
-          ].map(([ic, t, d]) => <div key={t} className="feat glass"><Icon d={ic} size={22} /><h3>{t}</h3><p className="muted">{d}</p></div>)}
+          ].map(([ic, t, d], i) => <div key={t} className="feat glass"><Duo tone={(['brand', 'accent', 'warn', 'ok'] as const)[i % 4]}><Icon d={ic} size={20} /></Duo><h3>{t}</h3><p className="muted">{d}</p></div>)}
         </div>
       </section>
 

@@ -9,6 +9,7 @@ import {
 import { Page } from '../components/Layout'
 import { Avatar, Banner, CreatorCard, MockFrame, PlatformBadge, PlatformStack, PortfolioCard, SlotCard, Stars, TierBadge } from '../components/Media'
 import { Empty, Field, Icon, I, Modal, useToast } from '../components/ui'
+import { PlatformOrbit } from '../components/Art'
 
 const toggle = <T,>(arr: T[], v: T) => (arr.includes(v) ? arr.filter((x) => x !== v) : [...arr, v])
 
@@ -56,12 +57,14 @@ export function Creators() {
     <Page>
       <section className="explore-h">
         <div><span className="eyebrow">Explore creators</span><h1>Find the right voice for your brand</h1>
-          <p className="muted lead">Browse creators by platform, niche, language and audience size. See their linked channels, open ad slots, prices in {SYMBOL}, ratings and completed deals.</p></div>
-        <div className="explore-stats glass">
+          <p className="muted lead">Browse creators by platform, niche, language and audience size. See their linked channels, open ad slots, prices in {SYMBOL}, ratings and completed deals.</p>
+          <div className="explore-stats glass">
           <div><b>{creators.filter((c) => !c.sample).length}</b><span>Creators</span></div>
           <div><b>{fmt(creators.filter((c) => !c.sample).reduce((s, c) => s + followersOf(c), 0))}</b><span>Combined reach</span></div>
           <div><b>{m.slots.filter((s) => !s.sample && isLive(s, m.bookings)).length}</b><span>Open slots</span></div>
         </div>
+        </div>
+        <PlatformOrbit size={200} />
       </section>
 
       {sampleN > 0 && <p className="note">Profiles marked <span className="sample">Sample</span> are fictional examples showing how creators appear on {'YOULIP.FUN'}. They are not bookable.</p>}

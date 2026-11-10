@@ -5,6 +5,7 @@ import { AD_TYPES, LENGTHS, PAY_TERMS, PLATFORMS, SYMBOL, ZONES, ZONE_KEYS } fro
 import { Page } from '../components/Layout'
 import { CaChips, ChainIcon, TokenSection } from '../components/Chain'
 import { Icon, I } from '../components/ui'
+import { Duo, FormatArt, StepNum } from '../components/Art'
 import { ADV_STEPS, CREATOR_STEPS } from './Landing'
 
 const B = cfg.brand
@@ -62,7 +63,7 @@ const SECTIONS: { key: string; title: string; body: ReactNode }[] = [
     <h4>6. Rate</h4><p>Both sides leave a 1–5 star review after completion.</p>
   </> },
   { key: 'formats', title: 'Ad formats', body: <>
-    <div className="doc-table">{AD_TYPES.map((a) => <div key={a.key}><b>{a.label}</b><span>{a.desc}.{a.overlay ? ' Placed and previewed in the editor.' : ''}</span></div>)}</div>
+    <div className="fmt-gallery">{AD_TYPES.map((a) => <div key={a.key} className="glass"><FormatArt type={a.key} /><b>{a.label}</b><span className="muted small">{a.desc}.{a.overlay ? ' Placed and previewed in the editor.' : ''}</span></div>)}</div>
     <h4>Positions</h4><p>Intro (start), mid-roll, outro (end). Overlays also have a duration on screen (2–60 seconds).</p>
     <h4>Overlay zones</h4><ul>{ZONE_KEYS.map((k) => <li key={k}>{ZONES[k].label}</li>)}</ul>
   </> },
@@ -153,9 +154,9 @@ export function Audience({ who }: { who: 'creators' | 'advertisers' }) {
           <div className="cta-row"><a className="btn lg" href={a.cta[1]}>{a.cta[0]}</a><a className="btn ghost lg" href={a.doc}>Read the guide</a></div>
         </div>
       </section>
-      <section className="section"><div className="grid c3">{a.cards.map(([ic, t, d]) => <div key={t} className="feat glass"><Icon d={ic} size={24} /><h3>{t}</h3><p className="muted">{d}</p></div>)}</div></section>
+      <section className="section"><div className="grid c3">{a.cards.map(([ic, t, d], i) => <div key={t} className="feat glass"><Duo tone={(['brand', 'accent', 'warn', 'ok'] as const)[i % 4]}><Icon d={ic} size={20} /></Duo><h3>{t}</h3><p className="muted">{d}</p></div>)}</div></section>
       <section className="section"><div className="sec-head"><span className="eyebrow">Workflow</span><h2>How it works</h2></div>
-        <ol className="steps">{a.steps.map(([t, d], i) => <li key={t} className="glass"><span>{String(i + 1).padStart(2, '0')}</span><b>{t}</b><p>{d}</p></li>)}</ol></section>
+        <ol className="steps">{a.steps.map(([t, d], i) => <li key={t} className="glass"><StepNum n={i + 1} /><b>{t}</b><p>{d}</p></li>)}</ol></section>
     </Page>
   )
 }

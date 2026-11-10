@@ -6,6 +6,7 @@ import {
   avgViewsOf, dateLabel, dealsDone, dur, fmt, followersOf, isLive, lengthOf, minPrice, PLATFORMS, ratingOf, spotsLeft, tierOf, tok, typeLabel,
 } from '../lib/constants'
 import { Icon, I } from './ui'
+import { PlatformIcon, TierGem } from './Art'
 
 const hue = (s: string) => [...s].reduce((a, c) => a + c.charCodeAt(0), 0) % 360
 
@@ -21,10 +22,7 @@ export function Banner({ u, children }: { u: User; children?: ReactNode }) {
   return <div className="banner" style={{ backgroundImage: url ? `url(${url})` : `radial-gradient(600px 200px at 20% 0, hsl(${h} 70% 45% / .55), transparent), radial-gradient(500px 200px at 90% 100%, hsl(${(h + 80) % 360} 70% 45% / .4), transparent)` }}>{children}</div>
 }
 
-export const PlatformBadge = ({ p, size = 22 }: { p: PlatformKey; size?: number }) => {
-  const m = PLATFORMS[p]
-  return <span className="pf" title={m.name} style={{ width: size, height: size, fontSize: size * (m.short.length > 2 ? 0.32 : 0.42), ['--pf' as string]: m.color }}>{m.short}</span>
-}
+export const PlatformBadge = ({ p, size = 22 }: { p: PlatformKey; size?: number }) => <PlatformIcon p={p} size={size} />
 export const PlatformStack = ({ list, size = 20 }: { list: PlatformKey[]; size?: number }) => (
   <span className="pf-stack">{[...new Set(list)].map((p) => <PlatformBadge key={p} p={p} size={size} />)}</span>
 )
@@ -34,7 +32,7 @@ export function Stars({ value, count, small }: { value: number; count?: number; 
   return <span className={`stars${small ? ' sm' : ''}`}><Icon d={I.star} size={small ? 12 : 14} />{value.toFixed(1)}<em>({count})</em></span>
 }
 
-export const TierBadge = ({ u }: { u: Pick<User, 'channels'> }) => { const t = tierOf(u); return <span className={`tier t-${t.key}`}>{t.label}</span> }
+export const TierBadge = ({ u }: { u: Pick<User, 'channels'> }) => { const t = tierOf(u); return <span className={`tier t-${t.key}`}><TierGem level={['nano', 'micro', 'mid', 'macro', 'mega'].indexOf(t.key)} />{t.label}</span> }
 
 function SaveBtn({ kind, id }: { kind: 'creator' | 'slot'; id: string }) {
   const { user, update } = useAuth()
