@@ -33,7 +33,7 @@ Everything brand- or token-related is in this one file.
 | `x` | X account URL (`https://x.com/You_tok`) |
 | `platformFeePct`, `maxVideoMB` | Platform settings |
 
-The CA is shown, with network icons and a Copy button, in the **top announcement bar**, **hero** (Copy buttons), **token section**, **footer**, **Docs → $YOUTOK token** and the **dashboard top bar**. Networks that share an address are grouped into one Copy button. When the CA is empty, the UI shows "CA soon". Live price/liquidity from DexScreener appears automatically once a CA is set.
+The CA is shown, with network icons and a Copy button, in the **top announcement bar**, **hero** (Copy buttons), **token section**, **footer**, **Docs → $LIP token** and the **dashboard top bar**. Networks that share an address are grouped into one Copy button. When the CA is empty, the UI shows "CA soon". Live price/liquidity from DexScreener appears automatically once a CA is set.
 
 Optional env (`.env`): `VITE_SOLANA_RPC`, `VITE_ROBINHOOD_RPC`, `VITE_ROBINHOOD_EXPLORER`.
 
@@ -55,7 +55,7 @@ Optional env (`.env`): `VITE_SOLANA_RPC`, `VITE_ROBINHOOD_RPC`, `VITE_ROBINHOOD_
 ## Data
 
 This version stores all data in the browser (IndexedDB, `src/lib/db.ts`), so the full flow works with no backend. To test both sides, use one browser and sign in as a creator, then as an advertiser.
-`supabase/schema.sql` defines the production tables (users, saved_creators, videos, campaigns, ad_placements, placement_events, contracts, transactions, collab_requests), which mirror the local store.
+`supabase/schema.sql` defines the production tables (users, channels, ad_slots, bookings, deliveries, booking_messages, booking_events, reviews, contracts, transactions, portfolio_videos, campaigns, collab_requests), which mirror the local store.
 
 ## Brand assets
 
