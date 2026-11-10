@@ -50,8 +50,8 @@ export default function Landing({ anchor }: { anchor?: string }) {
 
   const creators = m.users.filter((u) => u.role === 'creator' && u.listed)
   const live = m.slots.filter((s) => isLive(s, m.bookings))
-  const featured = [...creators].sort((a, b) => dealsDone(b.id, m.bookings) - dealsDone(a.id, m.bookings) || followersOf(b) - followersOf(a)).slice(0, 4)
-  const fresh = [...live].sort((a, b) => b.createdAt - a.createdAt).slice(0, 6)
+  const featured = [...creators].sort((a, b) => Number(!!a.sample) - Number(!!b.sample) || dealsDone(b.id, m.bookings) - dealsDone(a.id, m.bookings) || followersOf(b) - followersOf(a)).slice(0, 4)
+  const fresh = [...live].sort((a, b) => Number(!!a.sample) - Number(!!b.sample) || b.createdAt - a.createdAt).slice(0, 6)
   const uById = (id: string) => m.users.find((u) => u.id === id)
   const tags = Object.entries(live.flatMap((s) => s.tags).reduce<Record<string, number>>((a, t) => ({ ...a, [t]: (a[t] || 0) + 1 }), {})).sort((a, b) => b[1] - a[1]).slice(0, 18)
 
@@ -73,9 +73,9 @@ export default function Landing({ anchor }: { anchor?: string }) {
       </section>
 
       <section className="stats-band glass">
-        <div><b>{fmt(creators.length)}</b><span>Creators</span></div>
-        <div><b>{fmt(creators.reduce((s, c) => s + c.channels.length, 0))}</b><span>Channels linked</span></div>
-        <div><b>{fmt(live.length)}</b><span>Open ad slots</span></div>
+        <div><b>{fmt(creators.filter((c) => !c.sample).length)}</b><span>Creators</span></div>
+        <div><b>{fmt(creators.filter((c) => !c.sample).reduce((s, c) => s + c.channels.length, 0))}</b><span>Channels linked</span></div>
+        <div><b>{fmt(live.filter((s) => !s.sample).length)}</b><span>Open ad slots</span></div>
         <div><b>{fmt(m.bookings.filter((b) => b.status === 'completed').length)}</b><span>Deals completed</span></div>
         <div><b>{tok(tx.rows.reduce((s, t) => s + t.amount, 0))}</b><span>Paid to creators</span></div>
       </section>

@@ -69,6 +69,7 @@ export default function Editor({ slotId }: { slotId?: string }) {
   }
 
   if (!m.ready) return <Page><Empty title="Loading…" /></Page>
+  if (s?.sample) return <Page><Empty title="Sample slot" text="This slot belongs to a fictional sample profile and cannot be booked." action={<a className="btn" href="#/slots">Browse ad slots</a>} /></Page>
   if (!s) return <Page><Empty title="Ad slot not found" action={<a className="btn" href="#/slots">Browse ad slots</a>} /></Page>
 
   const meta = typeOf(type)

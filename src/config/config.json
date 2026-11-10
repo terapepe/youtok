@@ -49,5 +49,6 @@
   "x": "https://x.com/You_tok",
   "site": "https://youlip.fun",
   "platformFeePct": 5,
-  "maxVideoMB": 200
+  "maxVideoMB": 200,
+  "sampleCreators": true
 }

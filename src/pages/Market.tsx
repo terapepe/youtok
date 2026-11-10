@@ -47,9 +47,10 @@ export function Creators() {
       && (!f.openOnly || open.length > 0) && (!f.rating || r.avg >= f.rating)
       && (!f.maxPrice || from <= Number(f.maxPrice)))
     const key: Record<string, (x: typeof rows[0]) => number> = { followers: (x) => -x.fol, views: (x) => -x.views, rating: (x) => -(x.r.avg * 100 + x.r.count), deals: (x) => -x.deals, price: (x) => x.from, slots: (x) => -x.open.length, new: (x) => -x.c.createdAt }
-    return rows.sort((a, b) => key[f.sort](a) - key[f.sort](b))
+    return rows.sort((a, b) => Number(!!a.c.sample) - Number(!!b.c.sample) || key[f.sort](a) - key[f.sort](b))
   }, [m, f])
 
+  const sampleN = creators.filter((c) => c.sample).length
   const topRated = creators.map((c) => ({ c, r: ratingOf(c.id, m.bookings) })).filter((x) => x.r.count).sort((a, b) => b.r.avg - a.r.avg).slice(0, 3)
   return (
     <Page>
@@ -57,12 +58,13 @@ export function Creators() {
         <div><span className="eyebrow">Explore creators</span><h1>Find the right voice for your brand</h1>
           <p className="muted lead">Browse creators by platform, niche, language and audience size. See their linked channels, open ad slots, prices in {SYMBOL}, ratings and completed deals.</p></div>
         <div className="explore-stats glass">
-          <div><b>{creators.length}</b><span>Creators</span></div>
-          <div><b>{fmt(creators.reduce((s, c) => s + followersOf(c), 0))}</b><span>Combined reach</span></div>
-          <div><b>{m.slots.filter((s) => isLive(s, m.bookings)).length}</b><span>Open slots</span></div>
+          <div><b>{creators.filter((c) => !c.sample).length}</b><span>Creators</span></div>
+          <div><b>{fmt(creators.filter((c) => !c.sample).reduce((s, c) => s + followersOf(c), 0))}</b><span>Combined reach</span></div>
+          <div><b>{m.slots.filter((s) => !s.sample && isLive(s, m.bookings)).length}</b><span>Open slots</span></div>
         </div>
       </section>
 
+      {sampleN > 0 && <p className="note">Profiles marked <span className="sample">Sample</span> are fictional examples showing how creators appear on {'YOULIP.FUN'}. They are not bookable.</p>}
       {topRated.length > 0 && <section className="spotlight">
         <h3><Icon d={I.star} /> Top rated</h3>
         <div className="spot-row">{topRated.map(({ c, r }) => <a key={c.id} className="spot glass" href={`#/creator/${c.id}`}><Avatar u={c} size={44} /><div><b>{c.name}</b><Stars value={r.avg} count={r.count} small /></div><TierBadge u={c} /></a>)}</div>
@@ -118,7 +120,7 @@ export function Slots() {
       soon: (x) => (x.publishBy ? Date.parse(x.publishBy) : 9e15), new: (x) => -x.createdAt, low: (x) => minPrice(x), high: (x) => -minPrice(x),
       reach: (x) => -followersOf(uById(x.creatorId) || { channels: [] }), spots: (x) => -spotsLeft(x, m.bookings),
     }
-    return rows.sort((a, b) => key[f.sort](a) - key[f.sort](b))
+    return rows.sort((a, b) => Number(!!a.sample) - Number(!!b.sample) || key[f.sort](a) - key[f.sort](b))
   }, [m, f])
   return (
     <Page>
@@ -199,7 +201,7 @@ export function SlotDetail({ id }: { id: string }) {
           <div className="glass vd-ad">
             <h3>Ad formats & prices</h3>
             <ul className="kv">{s.formats.map((x) => <li key={x.type}><span>{typeLabel(x.type)}</span><b>{tok(x.price)}</b></li>)}</ul>
-            {live ? (user?.id === s.creatorId ? <a className="btn block" href="#/studio/slots">Manage this slot</a> : <a className="btn block" href={`#/book/${s.id}`}><Icon d={I.edit} size={16} />Book this slot</a>)
+            {s.sample ? <p className="note">This is a <b>sample</b> slot from a fictional profile. It cannot be booked.</p> : live ? (user?.id === s.creatorId ? <a className="btn block" href="#/studio/slots">Manage this slot</a> : <a className="btn block" href={`#/book/${s.id}`}><Icon d={I.edit} size={16} />Book this slot</a>)
               : <p className="muted">{s.status !== 'open' ? `This slot is ${s.status}.` : left ? 'The publish date has passed.' : 'All spots are booked.'}</p>}
             <button className="btn ghost block mt" onClick={() => { navigator.clipboard.writeText(location.href); toast('Link copied') }}><Icon d={I.copy} size={15} />Share slot</button>
             <p className="muted small mt">{fmt(s.views)} views · listed {new Date(s.createdAt).toLocaleDateString('en')}</p>
@@ -255,14 +257,15 @@ export function CreatorProfile({ id }: { id: string }) {
         <div className="profile-h">
           <Avatar u={c} size={104} />
           <div className="grow">
-            <h1>{c.name} <TierBadge u={c} /></h1>
+            <h1>{c.name} <TierBadge u={c} />{c.sample && <span className="sample">Sample</span>}</h1>
+            {c.sample && <p className="note">Fictional sample profile: an example of how creators appear here. Not bookable.</p>}
             <p className="muted">@{c.handle} · {c.category} · {c.language}{c.country && ` · ${c.country}`}</p>
             <p>{c.bio}</p>
             <div className="row-g"><Stars value={r.avg} count={r.count} /><span className="muted small">{dealsDone(c.id, m.bookings)} completed deals · member since {new Date(c.createdAt).toLocaleDateString('en', { month: 'short', year: 'numeric' })}</span></div>
           </div>
           <div className="profile-a">
             <button className="btn" onClick={() => setTab('slots')}><Icon d={I.slot} size={16} />See ad slots</button>
-            <button className="btn ghost" onClick={() => setHire(true)}><Icon d={I.send} size={16} />Custom request</button>
+            {!c.sample && <button className="btn ghost" onClick={() => setHire(true)}><Icon d={I.send} size={16} />Custom request</button>}
             <button className="btn ghost" onClick={toggleSave}><Icon d={I.bookmark} size={16} />{saved ? 'Saved' : 'Save'}</button>
           </div>
         </div>
@@ -277,7 +280,7 @@ export function CreatorProfile({ id }: { id: string }) {
       <div className="seg tabs">{([['slots', `Ad slots (${slots.length})`], ['channels', `Channels (${c.channels.length})`], ['portfolio', `Portfolio (${videos.length})`], ['reviews', `Reviews (${reviews.length})`]] as const).map(([k, l]) => <button key={k} className={tab === k ? 'on' : ''} onClick={() => setTab(k)}>{l}</button>)}</div>
       {tab === 'slots' && (slots.length ? <div className="grid c3">{slots.map((s) => <SlotCard key={s.id} s={s} c={c} bookings={m.bookings} />)}</div> : <Empty title="No ad slots right now" text="Send a custom request instead." />)}
       {tab === 'channels' && (c.channels.length ? <div className="grid c3">{c.channels.map((ch, i) => (
-        <a key={i} className="chan glass" href={ch.url} target="_blank" rel="noreferrer" style={{ ['--pf' as string]: PLATFORMS[ch.platform].color }}>
+        <a key={i} className="chan glass" href={ch.url || undefined} target="_blank" rel="noreferrer" style={{ ['--pf' as string]: PLATFORMS[ch.platform].color }}>
           <PlatformBadge p={ch.platform} size={40} /><div className="grow"><b>{PLATFORMS[ch.platform].name}</b><span className="muted small">@{ch.handle} ↗</span></div>
           <div className="chan-s"><b>{fmt(ch.followers)}</b><span>followers</span><b>{fmt(ch.avgViews)}</b><span>avg views</span></div>
           <span className={`badge ${ch.verified ? 'ok' : 'muted'}`}>{ch.verified ? 'Verified' : 'Self-reported'}</span>

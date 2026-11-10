@@ -1,5 +1,6 @@
 import { useEffect, useState, useSyncExternalStore } from 'react'
 import { blobUrl, db, subscribe, Table } from './db'
+import { samples } from '../data/samples'
 
 let version = 0
 subscribe(() => { version++ })
@@ -36,6 +37,6 @@ export const query = () => new URLSearchParams(location.hash.split('?')[1] || ''
 // All marketplace tables at once (live)
 export function useMarket() {
   const users = useTable('users'), slots = useTable('slots'), bookings = useTable('bookings'), videos = useTable('videos')
-  return { users: users.rows, slots: slots.rows, bookings: bookings.rows, videos: videos.rows, ready: users.ready && slots.ready && bookings.ready }
+  return { users: [...users.rows, ...samples.users], slots: [...slots.rows, ...samples.slots], bookings: bookings.rows, videos: videos.rows, ready: users.ready && slots.ready && bookings.ready }
 }
 export type Market = ReturnType<typeof useMarket>

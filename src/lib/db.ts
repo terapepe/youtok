@@ -17,6 +17,7 @@ export interface User {
   avatarId?: string; bannerId?: string; channels: Channel[]; website?: string
   wallets: { evm?: string; sol?: string }
   listed: boolean; company?: string; saved: string[]; savedSlots: string[]; createdAt: number
+  sample?: boolean // fictional sample profile (src/data/samples.ts), not bookable
 }
 
 // A creator's offer: "I will make a <length> video about <tags> on <platforms>, ad space costs X $LIP"
@@ -28,6 +29,7 @@ export interface Slot {
   formats: SlotFormat[]; positions: Position[]; zones: ZoneKey[]
   spots: number; exclusive: boolean; publishBy: string; payTerms: PayTerms; blocked: string[]
   sampleVideoId?: string; status: 'open' | 'paused' | 'closed'; views: number; createdAt: number; updatedAt: number
+  sample?: boolean
 }
 
 export type BookingStatus = 'requested' | 'countered' | 'accepted' | 'delivered' | 'revision' | 'completed' | 'declined' | 'cancelled' | 'disputed'

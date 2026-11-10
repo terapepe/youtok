@@ -60,7 +60,7 @@ export function CreatorCard({ c, m, list }: { c: User; m: Market; list?: boolean
       {!list && <Banner u={c} />}
       <div className="ccard-h">
         <Avatar u={c} size={list ? 52 : 60} />
-        <div className="grow"><b className="clamp1">{c.name}{c.channels.some((x) => x.verified) && <Icon d={I.check} size={14} />}</b><span className="muted small">@{c.handle} · {c.category}</span></div>
+        <div className="grow"><b className="clamp1">{c.name}{c.channels.some((x) => x.verified) && <Icon d={I.check} size={14} />}</b><span className="muted small">{c.sample && <span className="sample first">Sample</span>}@{c.handle} · {c.category}</span></div>
         <SaveBtn kind="creator" id={c.id} />
       </div>
       {!list && <p className="muted small clamp2">{c.bio || 'No bio yet.'}</p>}
@@ -97,7 +97,7 @@ export function SlotCard({ s, c, bookings }: { s: Slot; c?: User; bookings: Book
       <ul className="fmt-prices">{s.formats.slice(0, 3).map((f) => <li key={f.type}><span>{typeLabel(f.type)}</span><b>{tok(f.price)}</b></li>)}{s.formats.length > 3 && <li className="muted small">+{s.formats.length - 3} more formats</li>}</ul>
       <div className="scard-f">
         <span className="small muted"><Icon d={I.cal} size={13} /> by {dateLabel(s.publishBy)} · {s.exclusive ? 'Exclusive' : `${left}/${s.spots} spots`}</span>
-        {live ? <a className="btn sm" href={`#/book/${s.id}`}>Book · {tok(p)}</a> : <span className="badge muted">{s.status !== 'open' ? s.status : left ? 'Expired' : 'Sold out'}</span>}
+        {s.sample ? <span className="sample" title="Sample profile — not bookable">Sample · {tok(p)}</span> : live ? <a className="btn sm" href={`#/book/${s.id}`}>Book · {tok(p)}</a> : <span className="badge muted">{s.status !== 'open' ? s.status : left ? 'Expired' : 'Sold out'}</span>}
       </div>
     </article>
   )
