@@ -13,7 +13,7 @@
     "base",
     "bsc"
   ],
-  "evmAddress": "0xaf78ca371c92c7dce0ce9b2ef1a395d6ad7890b7",
+  "evmAddress": "",
   "solanaAddress": "",
   "tokenDecimals": 18,
   "chains": {
