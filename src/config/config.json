@@ -5,7 +5,7 @@
   "symbol": "LIP",
   "tagline": "Your Content. Their Brand. Shared Value.",
   "positioning": "The Marketplace Where Creators Pre-Sell Ad Slots and Brands Find Their Audience.",
-  "mode": "single",
+  "mode": "multi",
   "singleNetwork": "robinhood",
   "multiOrder": [
     "solana",
