@@ -30,7 +30,7 @@ Everything brand- or token-related is in this one file.
 | `chains.<key>.ca` | Optional per-network CA override (takes priority) |
 | `chains.<key>.name/short/color/tagline` | Per-network display overrides |
 | `tokenDecimals` | Fallback decimals for EVM payments (read on-chain when possible) |
-| `x` | X account URL (`https://x.com/You_tok`) |
+| `x` | X account URL (`https://x.com/YoulipFun`) |
 | `platformFeePct`, `maxVideoMB` | Platform settings |
 
 The CA is shown, with network icons and a Copy button, in the **top announcement bar**, **hero** (Copy buttons), **token section**, **footer**, **Docs → $LIP token** and the **dashboard top bar**. Networks that share an address are grouped into one Copy button. When the CA is empty, the UI shows "CA soon". Live price/liquidity from DexScreener appears automatically once a CA is set.
