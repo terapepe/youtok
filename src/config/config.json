@@ -1,8 +1,8 @@
 {
   "_readme": "Edit this file to change brand, token, networks and contract addresses. See README.md → Configuration.",
   "brand": "YOULIP.FUN",
-  "tokenName": "LIP Network",
-  "symbol": "LIP",
+  "tokenName": "YOULIP Network",
+  "symbol": "YLIP",
   "tagline": "Your Content. Their Brand. Shared Value.",
   "positioning": "The Marketplace Where Creators Pre-Sell Ad Slots and Brands Find Their Audience.",
   "mode": "single",
