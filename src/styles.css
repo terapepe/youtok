@@ -101,7 +101,9 @@ select option { background: var(--bg2); }
 .ca-chip:hover:not(:disabled) { border-color: var(--accent); }
 .ca-chip:disabled { cursor: default; opacity: .75; }
 .ca-chip b { font-weight: 700; }
-.ca-chip code { color: var(--muted); }
+.ca-chip code { color: var(--muted); word-break: break-all; }
+.ca-btn { max-width: 100%; }
+.ca-btn code { font-size: 13px; word-break: break-all; text-align: left; }
 .ca-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .ca-grid.one { grid-template-columns: 1fr; max-width: 640px; }
 .ca-card { padding: 22px; border-top: 2px solid var(--net); }

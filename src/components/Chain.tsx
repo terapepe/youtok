@@ -15,7 +15,6 @@ function useCopy() {
   const [done, setDone] = useState('')
   return { done, copy: (id: string, v: string) => { navigator.clipboard.writeText(v); setDone(id); setTimeout(() => setDone(''), 1300) } }
 }
-const mid = (a: string) => (a.length > 18 ? `${a.slice(0, 8)}…${a.slice(-6)}` : a)
 
 // Compact CA chip(s): announcement bar, dashboard topbar, footer
 export function CaChips({ compact }: { compact?: boolean }) {
@@ -27,7 +26,7 @@ export function CaChips({ compact }: { compact?: boolean }) {
           onClick={() => g.ca && copy(g.id, g.ca)}>
           <ChainStack nets={g.nets} size={16} />
           {!compact && <b>{g.tag}</b>}
-          <code>{g.ca ? (done === g.id ? 'Copied ✓' : mid(g.ca)) : 'CA soon'}</code>
+          <code>{g.ca ? (done === g.id ? 'Copied ✓' : g.ca) : 'CA soon'}</code>
           {g.ca && <Icon d={I.copy} size={13} />}
         </button>
       ))}
@@ -35,7 +34,7 @@ export function CaChips({ compact }: { compact?: boolean }) {
   )
 }
 
-// Hero buttons: "Copy SOL CA" · "Copy RH/BASE/BSC CA"
+// Hero buttons: full CA + copy icon
 export function CopyCAButtons() {
   const { done, copy } = useCopy()
   const live = caGroups.filter((g) => g.ca)
@@ -43,8 +42,8 @@ export function CopyCAButtons() {
   return <>{live.map((g) => {
     const c = g.nets.length === 1 ? g.nets[0].color : undefined
     return (
-      <button key={g.id} className="btn ghost lg" style={c ? { borderColor: c } : undefined} onClick={() => copy(g.id, g.ca)}>
-        <ChainStack nets={g.nets} />{done === g.id ? 'Copied ✓' : `Copy ${g.tag} CA`}
+      <button key={g.id} className="btn ghost lg ca-btn" style={c ? { borderColor: c } : undefined} onClick={() => copy(g.id, g.ca)} title={`Copy ${g.tag} contract address`}>
+        <ChainStack nets={g.nets} /><code>{done === g.id ? 'Copied ✓' : g.ca}</code><Icon d={I.copy} size={16} />
       </button>
     )
   })}</>
