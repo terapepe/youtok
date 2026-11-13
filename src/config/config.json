@@ -6,14 +6,14 @@
   "tagline": "Your Content. Their Brand. Shared Value.",
   "positioning": "The Marketplace Where Creators Pre-Sell Ad Slots and Brands Find Their Audience.",
   "mode": "single",
-  "singleNetwork": "base",
+  "singleNetwork": "robinhood",
   "multiOrder": [
     "solana",
     "robinhood",
     "base",
     "bsc"
   ],
-  "evmAddress": "0x260a9681608e81be92d0845f245969e65e526a01",
+  "evmAddress": "",
   "solanaAddress": "",
   "tokenDecimals": 18,
   "chains": {
