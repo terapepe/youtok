@@ -2,7 +2,7 @@
   "_readme": "Edit this file to change brand, token, networks and contract addresses. See README.md → Configuration.",
   "brand": "YOULIP.FUN",
   "tokenName": "YOULIP Media",
-  "symbol": "YLIP",
+  "symbol": "YOULIP",
   "tagline": "Your Content. Their Brand. Shared Value.",
   "positioning": "The Marketplace Where Creators Pre-Sell Ad Slots and Brands Find Their Audience.",
   "mode": "single",
@@ -13,7 +13,7 @@
     "base",
     "bsc"
   ],
-  "evmAddress": "",
+  "evmAddress": "0xe393a92989869b26ce44f048123820f826dfcbc0",
   "solanaAddress": "",
   "tokenDecimals": 18,
   "chains": {
