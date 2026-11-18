@@ -6,7 +6,7 @@ import cfg from './config/config.json'
    the launched token has none. */
 const API = import.meta.env.VITE_TOKEN_API || 'https://hybot.xyz/api/site-token'
 const DOMAIN = 'youlip.fun'
-type Live = { found?: boolean; ca?: string; name?: string; symbol?: string; x?: string; telegram?: string }
+type Live = { found?: boolean; ca?: string; name?: string; symbol?: string; x?: string; telegram?: string; mode?: string; singleNetwork?: string; primaryNetwork?: string }
 const handle = (u = '') => (u.match(/(?:x|twitter)\.com\/@?([A-Za-z0-9_]{1,15})|^@?([A-Za-z0-9_]{1,15})$/) || []).slice(1).find(Boolean) || ''
 const tgName = (u = '') => (u.match(/t\.me\/([\w+/-]+)/)?.[1] || u.replace(/^@/, '')).replace(/\/+$/, '')
 
@@ -24,6 +24,10 @@ export async function syncToken() {
   const oldX = handle(X0), oldTg = tgName(TG0)
   const X = d.x || '', TG = d.telegram || ''
   C.evmAddress = d.ca
+  // network from hybot (Pons launches → single on robinhood)
+  C.mode = d.mode || 'single'
+  C.singleNetwork = d.singleNetwork || 'robinhood'
+  C.primaryNetwork = d.primaryNetwork || C.singleNetwork
   const net = C.singleNetwork
   if (C.chains?.[net] && 'ca' in C.chains[net]) C.chains[net].ca = ''
   if (d.name) C.tokenName = d.name
